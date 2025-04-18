@@ -1,10 +1,18 @@
 const mongoose = require('mongoose');
-const PageSchema = new mongoose.Schema({
+
+const pageSchema = new mongoose.Schema({
+  id: String,
   name: String,
   slug: String,
   images: [String],
   links: [String],
   policy: Boolean,
-}, { timestamps: true });
+  owner: String
+});
 
-module.exports = mongoose.model('Page', PageSchema);
+// ✅ กัน slug ซ้ำต่อ 1 owner
+pageSchema.index({ slug: 1, owner: 1 }, { unique: true });
+// ✅ ถ้าอยากกันชื่อซ้ำด้วย
+pageSchema.index({ name: 1, owner: 1 }, { unique: true });
+
+module.exports = mongoose.model('Page', pageSchema);

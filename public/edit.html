@@ -36,17 +36,15 @@
     <div>แก้ไข Sale Page</div>
     <button class="btn btn-back" onclick="history.back()">ย้อนกลับ</button>
   </nav>
-
   <main>
     <form id="edit-form">
-      <label>ชื่อเพจ:</label>
-      <input id="name-input" type="text" required>
-
+      <label for="name-input">ชื่อเพจ:</label>
+      <input id="name-input" type="text" placeholder="กรอกชื่อ" required />
       <label>ลิงก์เพจ (slug):</label>
       <div id="link-group">
-        <input id="link-input" type="text">
-        <button type="button" class="btn btn-generate" id="btn-generate">สร้างจากชื่อ</button>
-        <button type="button" class="btn btn-copy" id="btn-copy">คัดลอก</button>
+        <input id="link-input" type="text" placeholder="เช่น https://web-sale.onrender.com/xxxxxx" />
+        <button type="button" id="btn-generate" class="btn btn-generate">สร้างจากชื่อ</button>
+        <button type="button" id="btn-copy" class="btn btn-copy">คัดลอก</button>
       </div>
       <small>ตัวอย่าง URL: <code id="url-preview">—</code></small>
 
@@ -60,13 +58,13 @@
         <label style="margin-top:.8rem">ลิงก์นโยบายความเป็นส่วนตัว:</label>
         <div style="display:flex;gap:.5rem;align-items:center;margin-top:.3rem">
           <input id="pdpa-link" type="text" readonly>
-          <button type="button" class="btn btn-copy" id="pdpa-copy">คัดลอก</button>
+          <button type="button" id="pdpa-copy" class="btn btn-copy">คัดลอก</button>
         </div>
       </div>
 
       <div style="display:flex;gap:.5rem;margin-top:2rem">
         <button type="submit" class="btn btn-save">บันทึก</button>
-        <button type="button" class="btn btn-preview" id="btn-preview">Preview</button>
+        <button type="button" id="btn-preview" class="btn btn-preview">Preview</button>
       </div>
     </form>
   </main>
@@ -74,11 +72,8 @@
 <script>
 (() => {
   const MAX_IMAGES = 10;
-  const id = new URLSearchParams(location.search).get('id');
-  let item = {
-    name: '', slug: '', images: Array(MAX_IMAGES).fill(''), links: Array(MAX_IMAGES).fill(''), policy: false
-  };
-
+  const params = new URLSearchParams(location.search);
+  const id = params.get('id') || Date.now().toString();
   const nameI = document.getElementById('name-input');
   const slugI = document.getElementById('link-input');
   const urlPrev = document.getElementById('url-preview');
@@ -87,100 +82,93 @@
   const pdpaWrap = document.getElementById('pdpa-link-wrap');
   const pdpaI = document.getElementById('pdpa-link');
 
-  const slugify = str => str.toLowerCase().trim().replace(/[\u0E00-\u0E7F]/g,'').replace(/[^a-z0-9]+/g,'').substring(0,40);
+  let item = { id, name: '', slug: '', images: Array(MAX_IMAGES).fill(''), links: Array(MAX_IMAGES).fill(''), policy: false };
+
+  const slugify = str => str.toLowerCase().trim().replace(/[฀-๿]/g, '').replace(/[^a-z0-9]+/g, '').substring(0, 40);
   const fullURL = s => `${location.origin}/${s}`;
 
-  if (id) {
-    fetch(`/api/pages/${id}`).then(res => res.json()).then(data => {
-      item = data;
-      nameI.value = item.name;
-      slugI.value = item.slug;
-      pdpaT.checked = item.policy;
-      buildSlots();
-      togglePdpa();
-      updateURL();
-    });
-  } else {
+  async function fetchItem() {
+    const res = await fetch('/api/pages');
+    const all = await res.json();
+    const found = all.find(x => x.id === id);
+    if (found) item = found;
+  }
+
+  async function init() {
+    await fetchItem();
+    nameI.value = item.name;
+    slugI.value = item.slug;
+    pdpaT.checked = item.policy;
+    updateURL();
     buildSlots();
+    togglePdpa();
+  }
+
+  function updateURL() {
+    const s = slugI.value.trim();
+    urlPrev.textContent = s ? fullURL(s) : '—';
+    if (pdpaT.checked) pdpaI.value = s ? `${fullURL(s)}/policy` : '';
+  }
+
+  function togglePdpa() {
+    pdpaWrap.style.display = pdpaT.checked ? 'block' : 'none';
+    if (pdpaT.checked) updateURL();
   }
 
   document.getElementById('btn-generate').onclick = () => {
     slugI.value = slugify(nameI.value);
     updateURL();
   };
+
   slugI.oninput = updateURL;
   document.getElementById('btn-copy').onclick = () => navigator.clipboard.writeText(urlPrev.textContent);
-  document.getElementById('pdpa-copy').onclick = () => navigator.clipboard.writeText(pdpaI.value);
   pdpaT.onchange = () => { item.policy = pdpaT.checked; togglePdpa(); };
+  document.getElementById('pdpa-copy').onclick = () => navigator.clipboard.writeText(pdpaI.value);
 
   document.getElementById('edit-form').onsubmit = async e => {
     e.preventDefault();
-    if (!validate()) return;
-
-    item.name = nameI.value.trim();
-    item.slug = slugI.value.trim();
-    item.images.length = MAX_IMAGES;
-    item.links.length = MAX_IMAGES;
-    item.policy = pdpaT.checked;
-
-    const method = id ? 'PUT' : 'POST';
-    const url = id ? `/api/pages/${id}` : '/api/pages';
-
-    const res = await fetch(url, {
-      method,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(item)
-    });
-    const data = await res.json();
+    const ok = await validate();
+    if (!ok) return;
+    await persist();
     location.href = 'home.html';
   };
 
   document.getElementById('btn-preview').onclick = async () => {
-    if (!validate()) return;
-    item.name = nameI.value.trim();
-    item.slug = slugI.value.trim();
-    item.images.length = MAX_IMAGES;
-    item.links.length = MAX_IMAGES;
-    item.policy = pdpaT.checked;
-
-    const method = id ? 'PUT' : 'POST';
-    const url = id ? `/api/pages/${id}` : '/api/pages';
-
-    const res = await fetch(url, {
-      method,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(item)
-    });
-    const saved = await res.json();
-    window.open(fullURL(saved.slug), '_blank');
+    const ok = await validate();
+    if (!ok) return;
+    await persist();
+    window.open(urlPrev.textContent, '_blank');
   };
 
-  function updateURL(){
-    const s = slugI.value.trim();
-    urlPrev.textContent = s ? fullURL(s) : '—';
-    if (pdpaT.checked) pdpaI.value = s ? `${fullURL(s)}/policy` : '';
-  }
-
-  function togglePdpa(){
-    pdpaWrap.style.display = pdpaT.checked ? 'block' : 'none';
-    if (pdpaT.checked) updateURL();
-  }
-
-  function buildSlots(){
+  function buildSlots() {
     slots.innerHTML = '';
-    for (let i = 0; i < MAX_IMAGES; i++){
+    for (let i = 0; i < MAX_IMAGES; i++) {
       const slot = document.createElement('div');
       slot.className = 'slot';
-
       const img = document.createElement('img');
       if (item.images[i]) {
         img.src = item.images[i];
         img.style.display = 'block';
       }
-
       const file = document.createElement('input');
       file.type = 'file';
       file.accept = 'image/*';
+
+      const linkBtn = document.createElement('button');
+      linkBtn.type = 'button';
+      linkBtn.className = 'link-btn';
+      linkBtn.textContent = 'ลิงก์';
+      if (item.links[i]) linkBtn.classList.add('has');
+
+      const delBtn = document.createElement('button');
+      delBtn.type = 'button';
+      delBtn.className = 'del-btn';
+      delBtn.textContent = 'ลบ';
+
+      const lbl = document.createElement('span');
+      lbl.className = 'label';
+      lbl.textContent = `ภาพที่ ${i + 1}`;
+
       file.onchange = e => {
         if (!e.target.files.length) return;
         const reader = new FileReader();
@@ -192,11 +180,6 @@
         reader.readAsDataURL(e.target.files[0]);
       };
 
-      const linkBtn = document.createElement('button');
-      linkBtn.type = 'button';
-      linkBtn.className = 'link-btn';
-      linkBtn.textContent = 'ลิงก์';
-      if (item.links[i]) linkBtn.classList.add('has');
       linkBtn.onclick = () => {
         if (!item.images[i]) return alert('กรุณาอัปโหลดรูปนี้ก่อนใส่ลิงก์');
         const url = prompt('ใส่ URL สำหรับคลิกที่ภาพนี้', item.links[i] || '');
@@ -205,10 +188,6 @@
         linkBtn.classList.add('has');
       };
 
-      const delBtn = document.createElement('button');
-      delBtn.type = 'button';
-      delBtn.className = 'del-btn';
-      delBtn.textContent = 'ลบ';
       delBtn.onclick = () => {
         if (!item.images[i]) return;
         if (!confirm('ต้องการลบภาพนี้หรือไม่?')) return;
@@ -219,22 +198,47 @@
         linkBtn.classList.remove('has');
       };
 
-      const lbl = document.createElement('span');
-      lbl.className = 'label';
-      lbl.textContent = `ภาพที่ ${i+1}`;
-
       slot.append(linkBtn, delBtn, img, file, lbl);
       slots.appendChild(slot);
     }
   }
 
-  function validate(){
+  async function validate() {
     const name = nameI.value.trim();
     const slug = slugI.value.trim();
-    if (!name){ alert('กรุณากรอกชื่อเพจ'); return false; }
-    if (!slug){ alert('กรุณากรอก slug'); return false; }
+    if (!name) return alert('กรุณากรอกชื่อเพจ'), false;
+    if (!slug) return alert('กรุณากรอก slug'), false;
+
+    const res = await fetch('/api/pages');
+    const all = await res.json();
+
+    const dupName = all.some(p => p.name.trim().toLowerCase() === name.toLowerCase() && p.id !== id);
+    const dupSlug = all.some(p => (p.slug || '') === slug && p.id !== id);
+
+    if (dupName) return alert('มีชื่อเพจนี้อยู่แล้ว'), false;
+    if (dupSlug) return alert('slug นี้ถูกใช้แล้ว'), false;
+
     return true;
   }
+
+  async function persist() {
+    item.id = id;
+    item.name = nameI.value.trim();
+    item.slug = slugI.value.trim();
+
+    if (!Array.isArray(item.images)) item.images = Array(MAX_IMAGES).fill('');
+    if (!Array.isArray(item.links)) item.links = Array(MAX_IMAGES).fill('');
+    item.images.length = MAX_IMAGES;
+    item.links.length = MAX_IMAGES;
+
+    await fetch('/api/pages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(item)
+    });
+  }
+
+  init();
 })();
 </script>
 </body>

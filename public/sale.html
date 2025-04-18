@@ -33,14 +33,15 @@
 <script>
 (async () => {
   const app = document.getElementById('app');
-  const slug = location.pathname.replace(/^\/+/, '').split('/')[0];
-
+  const slug = location.pathname.split('/')[1]?.toLowerCase();
   if (!slug) return showError('ไม่พบข้อมูล');
 
   try {
-    const res = await fetch(`/api/pages/slug/${slug}`);
-    if (!res.ok) throw new Error('404');
+    const res = await fetch(`/api/page/${slug}`);
+    if (!res.ok) return showError('ไม่พบข้อมูล');
     const item = await res.json();
+
+    const linksArr = item.links || [];
 
     document.title = item.name || 'Sale Page';
 
@@ -48,13 +49,12 @@
     h1.textContent = item.name || slug;
     app.appendChild(h1);
 
-    const linksArr = item.links || [];
-
     (item.images || []).forEach((src, idx) => {
       if (!src) return;
       const link = linksArr[idx] || '';
       const img = document.createElement('img');
       img.src = src;
+
       if (link) {
         const a = document.createElement('a');
         a.href = link;
@@ -66,9 +66,8 @@
         app.appendChild(img);
       }
     });
-
-  } catch (e) {
-    showError('ไม่พบข้อมูล');
+  } catch (err) {
+    showError('เกิดข้อผิดพลาดในการโหลดข้อมูล');
   }
 
   function showError(msg) {
