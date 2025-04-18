@@ -8,18 +8,14 @@
     *{box-sizing:border-box;font-family:sans-serif;}
     body{margin:0;color:#111}
 
-    /* ===== Top bar ===== */
     .navbar{display:flex;justify-content:space-between;align-items:center;background:#000;color:#fff;padding:1rem}
     .btn{border:none;border-radius:4px;padding:.45rem 1rem;font-size:.9rem;cursor:pointer;text-decoration:none}
     .btn-logout{background:#d90404;color:#fff;}
-
-    /* ===== Buttons ===== */
     .btn-create {background:#0f8d3e;color:#fff;margin:1rem 1rem 0 0;float:right;}
     .btn-edit   {background:#000;color:#fff;padding:.3rem .8rem;}
     .btn-delete {background:#d90404;color:#fff;padding:.3rem .8rem;margin-left:.3rem;}
     .btn:hover  {opacity:.8}
 
-    /* ===== Table ===== */
     table{width:100%;border-collapse:collapse;margin-top:1rem;clear:both}
     thead{background:#f5f5f5}
     th,td{padding:1rem;text-align:left;border-bottom:1px solid #eee}
@@ -27,13 +23,11 @@
   </style>
 </head>
 <body>
-  <!-- ===== Header ===== -->
   <nav class="navbar">
     <div>Sale Page</div>
     <a href="/logout" class="btn btn-logout">Logout</a>
   </nav>
 
-  <!-- ===== Main Content ===== -->
   <main style="padding:0 1rem 2rem">
     <a href="edit.html" class="btn btn-create">+ สร้าง</a>
 
@@ -49,54 +43,51 @@
   </main>
 
 <script>
-  const LS_KEY = 'names-list';
-  function getList(){
-    try{return JSON.parse(localStorage.getItem(LS_KEY)||'[]');}catch(e){return []}
-  }
-  function saveList(list){
-    localStorage.setItem(LS_KEY, JSON.stringify(list));
+  async function getList(){
+    try {
+      const res = await fetch('/api/pages');
+      return await res.json();
+    } catch (e) {
+      console.error('โหลดข้อมูลไม่สำเร็จ', e);
+      return [];
+    }
   }
 
-  function render(){
+  async function handleDelete(id){
+    if (!confirm('ต้องการลบเพจนี้หรือไม่?')) return;
+    await fetch(`/api/pages/${id}`, { method: 'DELETE' });
+    render();
+  }
+
+  async function render(){
     const tbody = document.getElementById('names-body');
     tbody.innerHTML = '';
-    const list = getList();
+    const list = await getList();
 
     list.forEach(item => {
       const tr = document.createElement('tr');
 
-      // ----- name column -----
       const tdName = document.createElement('td');
       tdName.textContent = item.name || '—';
 
-      // ----- actions column -----
       const tdAct = document.createElement('td');
 
-      // edit
       const editBtn = document.createElement('a');
       editBtn.textContent = 'แก้ไข';
       editBtn.className = 'btn btn-edit';
-      editBtn.href = `edit.html?id=${item.id}`;
+      editBtn.href = `edit.html?id=${item._id}`;
       tdAct.appendChild(editBtn);
 
-      // delete
       const delBtn = document.createElement('button');
       delBtn.textContent = 'ลบ';
       delBtn.className  = 'btn btn-delete';
-      delBtn.addEventListener('click', () => handleDelete(item.id));
+      delBtn.addEventListener('click', () => handleDelete(item._id));
       tdAct.appendChild(delBtn);
 
       tr.appendChild(tdName);
       tr.appendChild(tdAct);
       tbody.appendChild(tr);
     });
-  }
-
-  function handleDelete(id){
-    if(!confirm('ต้องการลบเพจนี้หรือไม่?')) return;
-    const list = getList().filter(x => x.id !== id);
-    saveList(list);
-    render();
   }
 
   render();

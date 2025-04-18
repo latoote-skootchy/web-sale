@@ -3,19 +3,14 @@
 <head>
   <meta charset="utf-8" />
   <title>แก้ไข Sale Page</title>
-
   <style>
     *{box-sizing:border-box;font-family:sans-serif}
     body{margin:0}
-
-    /* ===== NAV ===== */
     .navbar{display:flex;justify-content:space-between;align-items:center;background:#000;color:#fff;padding:1rem}
     .btn{border:none;border-radius:4px;padding:.45rem 1rem;font-size:.9rem;cursor:pointer}
     .btn-back{background:#666;color:#fff}
     .btn-save{background:#0f8d3e;color:#fff}
     .btn-preview{background:#007bff;color:#fff}
-
-    /* ===== FORM ===== */
     main{padding:1.5rem;max-width:760px;margin:0 auto}
     label{display:block;margin-top:1rem;font-weight:600}
     input[type="text"]{width:100%;padding:.55rem .7rem;border:1px solid #ccc;border-radius:4px}
@@ -23,8 +18,6 @@
     #link-input{flex:1}
     .btn-generate{background:#6c757d;color:#fff}
     .btn-copy{background:#ffc107;color:#fff}
-
-    /* ===== IMAGE SLOTS ===== */
     #image-slots{display:grid;gap:1rem;margin-top:1rem;grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
     .slot{border:1px dashed #ccc;border-radius:6px;padding:.5rem;text-align:center;position:relative;min-height:210px}
     .slot img{width:100%;height:120px;object-fit:cover;border-radius:4px;display:none;margin-bottom:.3rem}
@@ -34,8 +27,6 @@
     .link-btn{left:6px;background:#007bff}
     .link-btn.has{background:#28a745}
     .del-btn{right:6px;background:#d90404}
-
-    /* ===== PDPA ===== */
     #pdpa-link-wrap{display:none;margin-top:.8rem}
     #pdpa-link{padding:.55rem .7rem;border:1px solid #ccc;border-radius:4px;width:100%;background:#e9ecef}
   </style>
@@ -48,23 +39,20 @@
 
   <main>
     <form id="edit-form">
-      <!-- NAME / SLUG -->
-      <label for="name-input">ชื่อเพจ:</label>
-      <input id="name-input" type="text" placeholder="กรอกชื่อ" required />
+      <label>ชื่อเพจ:</label>
+      <input id="name-input" type="text" required>
 
       <label>ลิงก์เพจ (slug):</label>
       <div id="link-group">
-        <input id="link-input" type="text" placeholder="เช่น https://web-sale.onrender.com/xxxxx" />
-        <button type="button" id="btn-generate" class="btn btn-generate">สร้างจากชื่อ</button>
-        <button type="button" id="btn-copy" class="btn btn-copy">คัดลอก</button>
+        <input id="link-input" type="text">
+        <button type="button" class="btn btn-generate" id="btn-generate">สร้างจากชื่อ</button>
+        <button type="button" class="btn btn-copy" id="btn-copy">คัดลอก</button>
       </div>
       <small>ตัวอย่าง URL: <code id="url-preview">—</code></small>
 
-      <!-- IMAGES -->
       <label style="margin-top:1.5rem;">อัปโหลดภาพ (สูงสุด 10 ภาพ):</label>
       <div id="image-slots"></div>
 
-      <!-- PDPA -->
       <hr style="margin:2rem 0 1rem">
       <h3>นโยบายความเป็นส่วนตัว (PDPA)</h3>
       <label><input type="checkbox" id="pdpa-toggle"> เปิดใช้นโยบายความเป็นส่วนตัว</label>
@@ -72,102 +60,100 @@
         <label style="margin-top:.8rem">ลิงก์นโยบายความเป็นส่วนตัว:</label>
         <div style="display:flex;gap:.5rem;align-items:center;margin-top:.3rem">
           <input id="pdpa-link" type="text" readonly>
-          <button type="button" id="pdpa-copy" class="btn btn-copy" style="white-space:nowrap">คัดลอก</button>
+          <button type="button" class="btn btn-copy" id="pdpa-copy">คัดลอก</button>
         </div>
       </div>
 
-      <!-- ACTIONS -->
       <div style="display:flex;gap:.5rem;margin-top:2rem">
         <button type="submit" class="btn btn-save">บันทึก</button>
-        <button type="button" id="btn-preview" class="btn btn-preview">Preview</button>
+        <button type="button" class="btn btn-preview" id="btn-preview">Preview</button>
       </div>
     </form>
   </main>
 
 <script>
-(()=>{
-
-  /* --------- CONSTANTS & INIT DATA --------- */
+(() => {
   const MAX_IMAGES = 10;
-  const params = new URLSearchParams(location.search);
-  const id = params.get('id') || Date.now();          // new page if no id
-
-  /* ------------ STORAGE HELPERS ------------ */
-  const LS_KEY = 'names-list';
-  const getList = () => {
-    try { return JSON.parse(localStorage.getItem(LS_KEY) || '[]'); }
-    catch { return []; }
-  };
-  const setList = arr => localStorage.setItem(LS_KEY, JSON.stringify(arr));
-
-  /* -------------- CURRENT ITEM ------------- */
-  let list = getList();
-  let item = list.find(x => x.id == id) || {
-    id,
-    name: '',
-    slug: '',
-    images: Array(MAX_IMAGES).fill(''),
-    links : Array(MAX_IMAGES).fill(''),
-    policy: false
+  const id = new URLSearchParams(location.search).get('id');
+  let item = {
+    name: '', slug: '', images: Array(MAX_IMAGES).fill(''), links: Array(MAX_IMAGES).fill(''), policy: false
   };
 
-  /* --------------- ELEMENTS ---------------- */
-  const nameI   = document.getElementById('name-input');
-  const slugI   = document.getElementById('link-input');
+  const nameI = document.getElementById('name-input');
+  const slugI = document.getElementById('link-input');
   const urlPrev = document.getElementById('url-preview');
-  const slots   = document.getElementById('image-slots');
-  const pdpaT   = document.getElementById('pdpa-toggle');
-  const pdpaWrap= document.getElementById('pdpa-link-wrap');
-  const pdpaI   = document.getElementById('pdpa-link');
+  const slots = document.getElementById('image-slots');
+  const pdpaT = document.getElementById('pdpa-toggle');
+  const pdpaWrap = document.getElementById('pdpa-link-wrap');
+  const pdpaI = document.getElementById('pdpa-link');
 
-  /* --------------- UTILITIES --------------- */
-  const slugify = str =>
-    str.toLowerCase().trim()
-       .replace(/[\u0E00-\u0E7F]/g,'')         // ตัดอักษรไทยออก
-       .replace(/[^a-z0-9]+/g,'')              // ตัวอักษร+ตัวเลขเท่านั้น
-       .substring(0,40);
+  const slugify = str => str.toLowerCase().trim().replace(/[\u0E00-\u0E7F]/g,'').replace(/[^a-z0-9]+/g,'').substring(0,40);
   const fullURL = s => `${location.origin}/${s}`;
 
-  const dupName = n => getList().some(x =>
-    x.name.trim().toLowerCase() === n.trim().toLowerCase() && x.id !== item.id);
-  const dupSlug = s => getList().some(x => (x.slug||'') === s && x.id !== item.id);
+  if (id) {
+    fetch(`/api/pages/${id}`).then(res => res.json()).then(data => {
+      item = data;
+      nameI.value = item.name;
+      slugI.value = item.slug;
+      pdpaT.checked = item.policy;
+      buildSlots();
+      togglePdpa();
+      updateURL();
+    });
+  } else {
+    buildSlots();
+  }
 
-  /* --------------- INITIAL FILL ------------ */
-  nameI.value = item.name;
-  slugI.value = item.slug;
-  pdpaT.checked = item.policy;
-  updateURL();
-  buildSlots();
-  togglePdpa();
-
-  /* ---------------- EVENTS ----------------- */
   document.getElementById('btn-generate').onclick = () => {
     slugI.value = slugify(nameI.value);
     updateURL();
   };
   slugI.oninput = updateURL;
-
-  document.getElementById('btn-copy').onclick = () =>
-    navigator.clipboard.writeText(urlPrev.textContent);
-
+  document.getElementById('btn-copy').onclick = () => navigator.clipboard.writeText(urlPrev.textContent);
+  document.getElementById('pdpa-copy').onclick = () => navigator.clipboard.writeText(pdpaI.value);
   pdpaT.onchange = () => { item.policy = pdpaT.checked; togglePdpa(); };
-  document.getElementById('pdpa-copy').onclick = () =>
-    navigator.clipboard.writeText(pdpaI.value);
 
-  document.getElementById('edit-form').onsubmit = e => {
+  document.getElementById('edit-form').onsubmit = async e => {
     e.preventDefault();
     if (!validate()) return;
-    persist();
+
+    item.name = nameI.value.trim();
+    item.slug = slugI.value.trim();
+    item.images.length = MAX_IMAGES;
+    item.links.length = MAX_IMAGES;
+    item.policy = pdpaT.checked;
+
+    const method = id ? 'PUT' : 'POST';
+    const url = id ? `/api/pages/${id}` : '/api/pages';
+
+    const res = await fetch(url, {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(item)
+    });
+    const data = await res.json();
     location.href = 'home.html';
   };
 
-  document.getElementById('btn-preview').onclick = () => {
+  document.getElementById('btn-preview').onclick = async () => {
     if (!validate()) return;
-    persist();
-    window.open(urlPrev.textContent, '_blank');
-  };
+    item.name = nameI.value.trim();
+    item.slug = slugI.value.trim();
+    item.images.length = MAX_IMAGES;
+    item.links.length = MAX_IMAGES;
+    item.policy = pdpaT.checked;
 
-  /* -------------- FUNCTIONS --------------- */
+    const method = id ? 'PUT' : 'POST';
+    const url = id ? `/api/pages/${id}` : '/api/pages';
+
+    const res = await fetch(url, {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(item)
+    });
+    const saved = await res.json();
+    window.open(fullURL(saved.slug), '_blank');
+  };
 
   function updateURL(){
     const s = slugI.value.trim();
@@ -186,35 +172,15 @@
       const slot = document.createElement('div');
       slot.className = 'slot';
 
-      /* preview */
       const img = document.createElement('img');
       if (item.images[i]) {
         img.src = item.images[i];
         img.style.display = 'block';
       }
-      /* file input */
+
       const file = document.createElement('input');
       file.type = 'file';
       file.accept = 'image/*';
-
-      /* link + delete buttons */
-      const linkBtn = document.createElement('button');
-      linkBtn.type = 'button';
-      linkBtn.className = 'link-btn';
-      linkBtn.textContent = 'ลิงก์';
-      if (item.links[i]) linkBtn.classList.add('has');
-
-      const delBtn = document.createElement('button');
-      delBtn.type  = 'button';
-      delBtn.className = 'del-btn';
-      delBtn.textContent = 'ลบ';
-
-      /* label */
-      const lbl = document.createElement('span');
-      lbl.className = 'label';
-      lbl.textContent = `ภาพที่ ${i+1}`;
-
-      /* ---- event: upload ---- */
       file.onchange = e => {
         if (!e.target.files.length) return;
         const reader = new FileReader();
@@ -226,19 +192,23 @@
         reader.readAsDataURL(e.target.files[0]);
       };
 
-      /* ---- event: set link ---- */
+      const linkBtn = document.createElement('button');
+      linkBtn.type = 'button';
+      linkBtn.className = 'link-btn';
+      linkBtn.textContent = 'ลิงก์';
+      if (item.links[i]) linkBtn.classList.add('has');
       linkBtn.onclick = () => {
-        if (!item.images[i]){
-          alert('กรุณาอัปโหลดรูปนี้ก่อนใส่ลิงก์');
-          return;
-        }
-        const url = prompt('ใส่ URL สำหรับคลิกที่ภาพนี้', item.links[i]||'');
+        if (!item.images[i]) return alert('กรุณาอัปโหลดรูปนี้ก่อนใส่ลิงก์');
+        const url = prompt('ใส่ URL สำหรับคลิกที่ภาพนี้', item.links[i] || '');
         if (!url) return;
         item.links[i] = url.trim();
         linkBtn.classList.add('has');
       };
 
-      /* ---- event: delete ---- */
+      const delBtn = document.createElement('button');
+      delBtn.type = 'button';
+      delBtn.className = 'del-btn';
+      delBtn.textContent = 'ลบ';
       delBtn.onclick = () => {
         if (!item.images[i]) return;
         if (!confirm('ต้องการลบภาพนี้หรือไม่?')) return;
@@ -249,7 +219,10 @@
         linkBtn.classList.remove('has');
       };
 
-      /* assemble */
+      const lbl = document.createElement('span');
+      lbl.className = 'label';
+      lbl.textContent = `ภาพที่ ${i+1}`;
+
       slot.append(linkBtn, delBtn, img, file, lbl);
       slots.appendChild(slot);
     }
@@ -258,26 +231,10 @@
   function validate(){
     const name = nameI.value.trim();
     const slug = slugI.value.trim();
-
     if (!name){ alert('กรุณากรอกชื่อเพจ'); return false; }
     if (!slug){ alert('กรุณากรอก slug'); return false; }
-    if (dupName(name)){ alert('มีชื่อเพจนี้อยู่แล้ว'); return false; }
-    if (dupSlug(slug)){ alert('slug นี้ถูกใช้แล้ว'); return false; }
     return true;
   }
-
-  function persist(){
-    item.name = nameI.value.trim();
-    item.slug = slugI.value.trim();
-    /* ensure arrays length = MAX_IMAGES */
-    item.images.length = MAX_IMAGES;
-    item.links.length  = MAX_IMAGES;
-
-    list = getList().filter(x => x.id !== item.id);
-    list.push(item);
-    setList(list);
-  }
-
 })();
 </script>
 </body>

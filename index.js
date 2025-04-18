@@ -8,6 +8,15 @@ const path     = require('path');
 
 const app = express();
 
+const mongoose = require('mongoose');
+const pageRoutes = require('./routes/pages');
+app.use('/api/pages', pageRoutes);
+
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log('✅ MongoDB connected'))
+  .catch(err => console.error('❌ MongoDB error:', err));
+
+  
 /* ───── Session ───── */
 app.use(session({
   secret: 'your_session_secret',
