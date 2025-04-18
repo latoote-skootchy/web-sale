@@ -10,11 +10,10 @@ const Page = require('./models/Page');
 
 const app = express();
 
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-});
+// ✅ เชื่อม MongoDB
+mongoose.connect(process.env.MONGO_URI);
 
+// ✅ Middleware พื้นฐาน
 app.use(session({
   secret: 'your_session_secret',
   resave: false,
@@ -23,8 +22,8 @@ app.use(session({
 app.use(express.json({ limit: '10mb' }));
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(express.json());
 
+// ✅ Passport: Google OAuth
 passport.serializeUser((user, done) => done(null, user));
 passport.deserializeUser((obj, done) => done(null, obj));
 
@@ -41,8 +40,25 @@ function ensureAuthenticated(req, res, next) {
   return req.isAuthenticated() ? next() : res.redirect('/');
 }
 
+// ✅ Subdomain Routing Middleware
+app.use(async (req, res, next) => {
+  const host = req.hostname.toLowerCase();
+  const base = process.env.BASE_DOMAIN?.toLowerCase();
+  if (base && host.endsWith(base)) {
+    const sub = host.replace(`.${base}`, '');
+    if (sub && sub !== 'www') {
+      const page = await Page.findOne({ slug: sub });
+      if (page) return res.sendFile(path.join(__dirname, 'public/sale.html'));
+      return res.status(404).send('ไม่พบเพจนี้');
+    }
+  }
+  next();
+});
+
+// ✅ Static Files
 app.use(express.static(path.join(__dirname, 'public')));
 
+// ✅ Routes
 app.get('/', (req, res) => {
   req.isAuthenticated()
     ? res.redirect('/home')
@@ -73,7 +89,7 @@ app.get('/user-info', ensureAuthenticated, (req, res) =>
   })
 );
 
-// ───── API (MongoDB) ─────
+// ✅ API (MongoDB)
 app.get('/api/pages', ensureAuthenticated, async (req, res) => {
   const pages = await Page.find({ owner: req.user.emails[0].value });
   res.json(pages);
@@ -85,11 +101,9 @@ app.post('/api/pages', ensureAuthenticated, async (req, res) => {
   data.owner = email;
 
   try {
-    // ตรวจสอบว่ามี slug ซ้ำไหม (ยกเว้นตัวเดิม)
     const existSlug = await Page.findOne({ slug: data.slug, owner: email, id: { $ne: data.id } });
     if (existSlug) return res.status(400).json({ error: 'slug นี้ถูกใช้แล้ว' });
 
-    // ตรวจสอบว่ามีชื่อซ้ำไหม (ยกเว้นตัวเดิม)
     const existName = await Page.findOne({ name: data.name, owner: email, id: { $ne: data.id } });
     if (existName) return res.status(400).json({ error: 'ชื่อเพจนี้มีอยู่แล้ว' });
 
@@ -112,16 +126,17 @@ app.get('/api/page/:slug', async (req, res) => {
   res.json(page);
 });
 
-// ───── Serve sale page ─────
-app.get('/:slug', (_req, res) => {
-  res.sendFile(path.join(__dirname, 'public/sale.html'));
-});
+// ✅ Serve Page (fallback for path-based URL)
+app.get('/:slug', (_req, res) =>
+  res.sendFile(path.join(__dirname, 'public/sale.html'))
+);
 
-app.get('/:slug/policy', (_req, res) => {
-  res.sendFile(path.join(__dirname, 'public/policy.html'));
-});
+app.get('/:slug/policy', (_req, res) =>
+  res.sendFile(path.join(__dirname, 'public/policy.html'))
+);
 
+// ✅ Start Server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () =>
-  console.log(`Server running at http://localhost:${PORT}`)
+  console.log(`✅ Server running at http://localhost:${PORT}`)
 );

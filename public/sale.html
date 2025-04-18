@@ -33,7 +33,9 @@
 <script>
 (async () => {
   const app = document.getElementById('app');
-  const slug = location.pathname.split('/')[1]?.toLowerCase();
+  // const slug = location.pathname.split('/')[1]?.toLowerCase();
+  const slug = window.location.hostname.split('.')[0].toLowerCase();
+
   if (!slug) return showError('ไม่พบข้อมูล');
 
   try {

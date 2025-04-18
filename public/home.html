@@ -83,7 +83,8 @@
         const previewBtn = document.createElement('a');
         previewBtn.textContent = 'พรีวิว';
         previewBtn.className = 'btn btn-preview';
-        previewBtn.href = `/${item.slug}`;
+        // previewBtn.href = `/${item.slug}`;
+        previewBtn.href = `https://${item.slug}.${location.hostname}`;
         previewBtn.target = '_blank';
         tdAct.appendChild(previewBtn);
 
