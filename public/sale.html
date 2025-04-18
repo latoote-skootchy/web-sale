@@ -43,7 +43,7 @@
   if(!item) return showError('ไม่พบข้อมูล');
 
   const linksArr=item.links||[]; // may be undefined
-
+  document.title = item.name || 'Sale Page';
   /* title */
   const h1=document.createElement('h1');
   h1.textContent=item.name||slug;
