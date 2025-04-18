@@ -42,7 +42,7 @@
       <input id="name-input" type="text" placeholder="กรอกชื่อ" required />
       <label>ลิงก์เพจ (slug):</label>
       <div id="link-group">
-        <input id="link-input" type="text" placeholder="เช่น https://web-sale.onrender.com/xxxxxx" />
+        <input id="link-input" type="text" placeholder="เช่น somjai77" />
         <button type="button" id="btn-generate" class="btn btn-generate">สร้างจากชื่อ</button>
         <button type="button" id="btn-copy" class="btn btn-copy">คัดลอก</button>
       </div>
@@ -72,6 +72,8 @@
 <script>
 (() => {
   const MAX_IMAGES = 10;
+  const BASE_DOMAIN = 'skootchy.life';
+
   const params = new URLSearchParams(location.search);
   const id = params.get('id') || Date.now().toString();
   const nameI = document.getElementById('name-input');
@@ -85,7 +87,7 @@
   let item = { id, name: '', slug: '', images: Array(MAX_IMAGES).fill(''), links: Array(MAX_IMAGES).fill(''), policy: false };
 
   const slugify = str => str.toLowerCase().trim().replace(/[฀-๿]/g, '').replace(/[^a-z0-9]+/g, '').substring(0, 40);
-  const fullURL = s => `${location.origin}/${s}`;
+  const fullURL = s => `https://${s}.${BASE_DOMAIN}`;
 
   async function fetchItem() {
     const res = await fetch('/api/pages');
@@ -137,9 +139,7 @@
     const ok = await validate();
     if (!ok) return;
     await persist();
-    window.open(`https://${slugI.value.trim().toLowerCase()}.${location.hostname}`, '_blank');
-
-    // window.open(urlPrev.textContent, '_blank');
+    window.open(fullURL(slugI.value.trim().toLowerCase()), '_blank');
   };
 
   function buildSlots() {
