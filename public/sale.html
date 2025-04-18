@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <title>Sale Page</title>
+  <style>
+    *{box-sizing:border-box;font-family:sans-serif;}
+    body{margin:0;background:#000;color:#fff;}     /* ⬅ ดาร์กโหมด */
+    /* .wrap{max-width:780px;margin:0 auto;padding:1rem;}  */
+    .wrap{width:65vw;max-width:none;margin:0 auto;padding:1rem;} /* หรือปรับเป็น 1200px ก็ได้ */
+    h1{display:none}                               /* ⬅ ซ่อนชื่อเพจ */
+    /* เป็น */
+    img {
+      display: block;
+      width: 100%;      /* ⬅ บังคับให้ภาพยืดเต็ม .wrap */
+      height: auto;     /* รักษาสัดส่วน */
+      margin: 1rem 0;
+      border-radius: 6px;
+    }
+
+    /* (เสริม ถ้ารูปห่อด้วย <a> แล้วอยากให้กรอบคลิกเต็ม) */
+    a.img-link {
+      display: block;
+      width: 100%;
+    }
+    .error{padding:2rem;text-align:center;color:#ff4d4d;font-size:1.2rem;}
+  </style>
+</head>
+<body>
+  <div class="wrap" id="app"></div>
+
+<script>
+(() => {
+  const app=document.getElementById('app');
+  const slug=location.pathname.replace(/^\/+/, '').toLowerCase();
+  if(!slug) return showError('ไม่พบข้อมูล');
+
+  let list;
+  try{ list=JSON.parse(localStorage.getItem('names-list')||'[]'); }
+  catch{ return showError('ไม่พบข้อมูล'); }
+
+  const item=list.find(x=> (x.slug||'').toLowerCase()===slug);
+  if(!item) return showError('ไม่พบข้อมูล');
+
+  const linksArr=item.links||[]; // may be undefined
+
+  /* title */
+  const h1=document.createElement('h1');
+  h1.textContent=item.name||slug;
+  app.appendChild(h1);
+
+  /* images + optional links */
+  (item.images||[]).forEach((src,idx)=>{
+    if(!src) return; // skip empty slot
+    const link=linksArr[idx]||'';
+    const img=document.createElement('img');
+    img.src=src;
+    if(link){
+      const a=document.createElement('a');
+      a.href=link;
+      a.target='_blank';
+      a.className='img-link';
+      a.appendChild(img);
+      app.appendChild(a);
+    }else{
+      app.appendChild(img);
+    }
+  });
+
+  function showError(msg){
+    app.innerHTML=`<p class="error">${msg}</p>`;
+  }
+})();
+</script>
+</body>
+</html>

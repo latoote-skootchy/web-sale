@@ -1,0 +1,77 @@
+body {
+    margin: 0;
+    font-family: sans-serif;
+    background: #f2f2f2;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  
+  /* ===== Top Bar ===== */
+  .topbar {
+    background: #0d6efd;          /* แถบสีน้ำเงินเข้ม */
+    color: #fff;
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+  }
+  .brand {
+    font-size: 1.25rem;
+    font-weight: bold;
+  }
+  
+  /* ===== Content Container ===== */
+  .content-box {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  .container {
+    text-align: center;
+    background: #fff;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    min-width: 280px;
+  }
+  .logout-btn {
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    background: #dc3545;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 4px;
+  }
+
+  body {
+    font-family: sans-serif;
+    display: flex;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+    background: #f2f2f2;
+  }
+  .login-container, .container {
+    text-align: center;
+    background: #fff;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+  .btn-google {
+    display: inline-flex;
+    align-items: center;
+    padding: .5rem 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    text-decoration: none;
+    color: #333;
+    margin-top: 1rem;
+  }
+  .btn-google img {
+    width: 20px;
+    margin-right: .5rem;
+  }
