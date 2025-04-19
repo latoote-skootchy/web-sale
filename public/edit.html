@@ -177,16 +177,24 @@
       lbl.className = 'label';
       lbl.textContent = `ภาพที่ ${i + 1}`;
 
+      const EVENTS = {
+        'ผู้สนใจ (Lead)': 'Lead',
+        'ดูสินค้า (ViewContent)': 'ViewContent',
+        'ซื้อแล้ว (Purchase)': 'Purchase',
+        'เพิ่มลงตะกร้า (AddToCart)': 'AddToCart',
+        'สมัครรับข้อมูล (Subscribe)': 'Subscribe'
+      };
+
       const eventSelect = document.createElement('select');
       eventSelect.style.marginTop = '0.4rem';
       eventSelect.style.width = '100%';
       eventSelect.style.padding = '0.4rem';
       eventSelect.style.borderRadius = '4px';
 
-      ['Lead', 'ViewContent', 'Purchase'].forEach(event => {
+      Object.entries(EVENTS).forEach(([label, value]) => {
         const opt = document.createElement('option');
-        opt.value = event;
-        opt.textContent = `📌 Event: ${event}`;
+        opt.value = value;               // ✅ จะได้ 'Lead', 'Purchase', ...
+        opt.textContent = `📌 ${label}`; // ✅ แสดงข้อความไทย
         eventSelect.appendChild(opt);
       });
 
@@ -227,12 +235,13 @@
         linkBtn.classList.remove('has');
       };
       const eventLabel = document.createElement('span');
+      eventLabel.textContent = '📌 ';
       eventLabel.style.display = 'block';
-      eventLabel.style.fontSize = '0.85rem';
       eventLabel.style.marginTop = '0.5rem';
-      eventLabel.textContent = '📌 เลือก Event:';
+      eventLabel.style.fontSize = '0.85rem';
 
-      slot.append(linkBtn, delBtn, img, file, lbl, eventSelect);
+      
+      slot.append(linkBtn, delBtn, img, file, lbl, eventLabel, eventSelect);
       slots.appendChild(slot);
     }
   }
