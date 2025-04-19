@@ -51,6 +51,9 @@
       <label style="margin-top:1.5rem;">อัปโหลดภาพ (สูงสุด 10 ภาพ):</label>
       <div id="image-slots"></div>
 
+      <label for="pixel-input">Facebook Pixel ID:</label>
+      <input id="pixel-input" type="text" placeholder="เช่น 123456789012345" />
+
       <hr style="margin:2rem 0 1rem">
       <h3>นโยบายความเป็นส่วนตัว (PDPA)</h3>
       <label><input type="checkbox" id="pdpa-toggle"> เปิดใช้นโยบายความเป็นส่วนตัว</label>
@@ -83,6 +86,7 @@
   const pdpaT = document.getElementById('pdpa-toggle');
   const pdpaWrap = document.getElementById('pdpa-link-wrap');
   const pdpaI = document.getElementById('pdpa-link');
+  const pixelFB =  document.getElementById('pixel-input');
 
   let item = { id, name: '', slug: '', images: Array(MAX_IMAGES).fill(''), links: Array(MAX_IMAGES).fill(''), policy: false };
 
@@ -100,6 +104,8 @@
     await fetchItem();
     nameI.value = item.name;
     slugI.value = item.slug;
+    pixelFB.value = item.pixel || '';
+
     pdpaT.checked = item.policy;
     updateURL();
     buildSlots();
@@ -171,6 +177,27 @@
       lbl.className = 'label';
       lbl.textContent = `ภาพที่ ${i + 1}`;
 
+      const eventSelect = document.createElement('select');
+      eventSelect.style.marginTop = '0.4rem';
+      eventSelect.style.width = '100%';
+      eventSelect.style.padding = '0.4rem';
+      eventSelect.style.borderRadius = '4px';
+
+      ['Lead', 'ViewContent', 'Purchase'].forEach(event => {
+        const opt = document.createElement('option');
+        opt.value = event;
+        opt.textContent = `📌 Event: ${event}`;
+        eventSelect.appendChild(opt);
+      });
+
+      // ตั้งค่าเริ่มต้น
+      eventSelect.value = item.events?.[i] || 'Lead';
+
+      eventSelect.onchange = () => {
+        if (!Array.isArray(item.events)) item.events = Array(MAX_IMAGES).fill('');
+        item.events[i] = eventSelect.value;
+      };
+
       file.onchange = e => {
         if (!e.target.files.length) return;
         const reader = new FileReader();
@@ -227,11 +254,14 @@
     item.id = id;
     item.name = nameI.value.trim();
     item.slug = slugI.value.trim();
+    item.pixel = document.getElementById('pixel-input').value.trim();
 
     if (!Array.isArray(item.images)) item.images = Array(MAX_IMAGES).fill('');
     if (!Array.isArray(item.links)) item.links = Array(MAX_IMAGES).fill('');
     item.images.length = MAX_IMAGES;
     item.links.length = MAX_IMAGES;
+    if (!Array.isArray(item.events)) item.events = Array(MAX_IMAGES).fill('Lead');
+    item.events.length = MAX_IMAGES;
 
     await fetch('/api/pages', {
       method: 'POST',

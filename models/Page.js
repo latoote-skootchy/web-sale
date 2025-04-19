@@ -6,8 +6,10 @@ const pageSchema = new mongoose.Schema({
   slug: String,
   images: [String],
   links: [String],
+  events: [String], 
   policy: Boolean,
-  owner: String
+  owner: String,
+  pixel: String
 });
 
 // ✅ กัน slug ซ้ำต่อ 1 owner

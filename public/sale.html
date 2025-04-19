@@ -44,6 +44,29 @@
     const res = await fetch(`/api/page/${slug}`);
     if (!res.ok) return showError('ไม่พบข้อมูล');
     const item = await res.json();
+    if (item.pixel) {
+      const pixelId = String(item.pixel).replace(/[^0-9]/g, '');
+
+      const script = document.createElement('script');
+      script.innerHTML = `
+        !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+        n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+        n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+        t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)
+      }(window, document,'script',
+      'https://connect.facebook.net/en_US/fbevents.js');
+      fbq('init', '${item.pixel}');
+      fbq('track', 'PageView');
+      `;
+      document.head.appendChild(script);
+
+      const noscript = document.createElement('noscript');
+      noscript.innerHTML = `
+        <img height="1" width="1" style="display:none"
+            src="https://www.facebook.com/tr?id=${item.pixel}&ev=PageView&noscript=1"/>
+      `;
+      document.body.appendChild(noscript);
+    }
 
     const linksArr = item.links || [];
 
@@ -58,12 +81,20 @@
       const link = linksArr[idx] || '';
       const img = document.createElement('img');
       img.src = src;
+      const eventsArr = item.events || [];
+      const eventName = eventsArr[idx] || 'Lead';
+      
 
       if (link) {
         const a = document.createElement('a');
         a.href = link;
         a.target = '_blank';
         a.className = 'img-link';
+        a.onclick = () => {
+          if (typeof fbq === 'function') {
+            fbq('track', eventName);
+          }
+        };
         a.appendChild(img);
         app.appendChild(a);
       } else {
