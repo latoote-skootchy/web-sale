@@ -41,6 +41,8 @@ function ensureAuthenticated(req, res, next) {
 
 // ✅ ตรวจสอบซับโดเมนแล้วเสิร์ฟเพจ
 app.use(async (req, res, next) => {
+  if (req.path.startsWith('/api/')) return next();
+
   const host = req.hostname.toLowerCase();
   const base = process.env.BASE_DOMAIN?.toLowerCase();
 
