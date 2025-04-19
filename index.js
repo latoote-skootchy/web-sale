@@ -46,6 +46,7 @@ app.use(async (req, res, next) => {
 
   if (base && host.endsWith(base)) {
     const sub = host.replace(`.${base}`, '');
+    req.slugFromSubdomain = sub;
     if (sub && sub !== 'www') {
       const page = await Page.findOne({ slug: sub });
       if (page) {
@@ -129,7 +130,8 @@ app.delete('/api/pages/:id', ensureAuthenticated, async (req, res) => {
 });
 
 app.get('/api/page/:slug', async (req, res) => {
-  const page = await Page.findOne({ slug: req.params.slug });
+  const slug = req.params.slug || req.slugFromSubdomain;
+  const page = await Page.findOne({ slug });
   if (!page) return res.status(404).json({ error: 'not found' });
   res.json(page);
 });

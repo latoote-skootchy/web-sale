@@ -41,7 +41,7 @@
   if (!slug) return showError('ไม่พบข้อมูล');
 
   try {
-    const res = await fetch(`https://${BASE_DOMAIN}/api/page/${slug}`);
+    const res = await fetch(`/api/page/${slug}`);
     if (!res.ok) return showError('ไม่พบข้อมูล');
     const item = await res.json();
 
