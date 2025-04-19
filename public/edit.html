@@ -226,8 +226,13 @@
         file.value = '';
         linkBtn.classList.remove('has');
       };
+      const eventLabel = document.createElement('span');
+      eventLabel.style.display = 'block';
+      eventLabel.style.fontSize = '0.85rem';
+      eventLabel.style.marginTop = '0.5rem';
+      eventLabel.textContent = '📌 เลือก Event:';
 
-      slot.append(linkBtn, delBtn, img, file, lbl);
+      slot.append(linkBtn, delBtn, img, file, lbl, eventSelect);
       slots.appendChild(slot);
     }
   }
