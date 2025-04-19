@@ -84,7 +84,10 @@
         previewBtn.textContent = 'พรีวิว';
         previewBtn.className = 'btn btn-preview';
         // previewBtn.href = `/${item.slug}`;
-        previewBtn.href = `https://${item.slug}.${location.hostname}`;
+        const BASE_DOMAIN = 'skootchy.xyz'; // หรือจาก process.env ถ้า build ด้วย JS backend
+        previewBtn.href = `https://${item.slug}.${BASE_DOMAIN}`;
+
+        // previewBtn.href = `https://${item.slug}.${location.hostname}`;
         previewBtn.target = '_blank';
         tdAct.appendChild(previewBtn);
 
