@@ -235,12 +235,12 @@
         linkBtn.classList.remove('has');
       };
       const eventLabel = document.createElement('span');
-      eventLabel.textContent = '📌 ';
+      eventLabel.textContent = '📌 กำหนด Facebook Pixel Event:';
       eventLabel.style.display = 'block';
       eventLabel.style.marginTop = '0.5rem';
       eventLabel.style.fontSize = '0.85rem';
 
-      
+
       slot.append(linkBtn, delBtn, img, file, lbl, eventLabel, eventSelect);
       slots.appendChild(slot);
     }
