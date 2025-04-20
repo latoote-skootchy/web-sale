@@ -9,7 +9,8 @@ const pageSchema = new mongoose.Schema({
   events: [String], 
   policy: Boolean,
   owner: String,
-  pixel: String
+  pixel: String,
+  bridgeUrl: String
 });
 
 // ✅ กัน slug ซ้ำต่อ 1 owner

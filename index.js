@@ -53,7 +53,7 @@ app.use(async (req, res, next) => {
       const page = await Page.findOne({ slug: sub });
       if (page) {
         if (req.path === '/' || req.path === '') {
-          return res.sendFile(path.join(__dirname, 'public/sale.html'));
+          return res.sendFile(path.join(__dirname, 'public/bridge.html'));
         }
         if (req.path === '/policy' && page.policy) {
           return res.sendFile(path.join(__dirname, 'public/policy.html'));
@@ -147,6 +147,9 @@ app.get('/:slug/policy', (_req, res) =>
   res.sendFile(path.join(__dirname, 'public/policy.html'))
 );
 
+app.get('/sale', (req, res) =>
+  res.sendFile(path.join(__dirname, 'public/sale.html'))
+);
 // ✅ Start Server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () =>

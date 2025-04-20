@@ -50,6 +50,8 @@
 
       <label style="margin-top:1.5rem;">อัปโหลดภาพ (สูงสุด 10 ภาพ):</label>
       <div id="image-slots"></div>
+      <label for="bridge-url-input">ลิงก์ที่จะเปิดก่อนหน้า Sale:</label>
+      <input id="bridge-url-input" type="text" placeholder="เช่น https://www.youtube.com" />
 
       <label for="pixel-input">Facebook Pixel ID:</label>
       <input id="pixel-input" type="text" placeholder="เช่น 123456789012345" />
@@ -87,8 +89,9 @@
   const pdpaWrap = document.getElementById('pdpa-link-wrap');
   const pdpaI = document.getElementById('pdpa-link');
   const pixelFB =  document.getElementById('pixel-input');
+  const webDRec = document.getElementById('bridge-url-input');
 
-  let item = { id, name: '', slug: '', images: Array(MAX_IMAGES).fill(''), links: Array(MAX_IMAGES).fill(''), policy: false };
+  let item = { id, name: '', slug: '', images: Array(MAX_IMAGES).fill(''), links: Array(MAX_IMAGES).fill(''), policy: false , bridgeUrl: ''};
 
   const slugify = str => str.toLowerCase().trim().replace(/[฀-๿]/g, '').replace(/[^a-z0-9]+/g, '').substring(0, 40);
   const fullURL = s => `https://${s}.${BASE_DOMAIN}`;
@@ -105,6 +108,7 @@
     nameI.value = item.name;
     slugI.value = item.slug;
     pixelFB.value = item.pixel || '';
+    webDRec.value = item.bridgeUrl || '';
 
     pdpaT.checked = item.policy;
     updateURL();
@@ -276,6 +280,7 @@
     item.links.length = MAX_IMAGES;
     if (!Array.isArray(item.events)) item.events = Array(MAX_IMAGES).fill('Lead');
     item.events.length = MAX_IMAGES;
+    item.bridgeUrl = webDRec.value.trim();
 
     await fetch('/api/pages', {
       method: 'POST',

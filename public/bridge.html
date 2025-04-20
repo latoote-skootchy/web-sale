@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <title>กำลังโหลด...</title>
+  <script>
+    (async () => {
+      const BASE_DOMAIN = 'skootchy.xyz';
+      const slug = location.hostname.replace(`.${BASE_DOMAIN}`, '').toLowerCase();
+    
+      const res = await fetch(`/api/page/${slug}`);
+      const data = await res.json();
+      const bridgeUrl = data.bridgeUrl || '';
+      const delay = 3000;
+
+      if (bridgeUrl) {
+        document.body.textContent = 'กำลังเปิดเว็บไซต์แนะนำ...';
+        window.open(bridgeUrl, '_blank');
+      } else {
+        document.body.textContent = 'กำลังเข้าสู่หน้าขาย...';
+      }
+
+      // กลับเข้า /sale
+      setTimeout(() => {
+        window.location.href = '/sale';
+      }, delay);
+    })();
+    </script>
+    
+  <style>
+    body {
+      background: #000;
+      color: #fff;
+      font-family: sans-serif;
+      font-size: 1.3rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+  </style>
+</head>
+<body>
+  กำลังเปิดหน้าแนะนำก่อนเข้าหน้าขาย...
+</body>
+</html>
