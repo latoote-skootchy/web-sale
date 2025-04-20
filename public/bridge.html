@@ -14,14 +14,12 @@
             const delay = 3000;
 
             if (bridgeUrl) {
-                document.body.innerHTML = `
-                <div style="position:fixed; top:20px; left:50%; transform:translateX(-50%); background:#000; color:#fff; font-size:1.3rem; z-index:999;">
-                    ร้านค้า
+            document.body.innerHTML = `
+                <div style="position:fixed; top:20px; left:50%; transform:translateX(-50%); background:#000; color:#fff; font-size:1.3rem;">
+                ร้านค้า
                 </div>
-                <div style="padding-top:60px;">
-                    <iframe src="${bridgeUrl}" width="100%" height="90%" style="border:none;"></iframe>
-                </div>
-                `;
+                <iframe src="${bridgeUrl}" width="100%" height="80%" style="border:none;"></iframe>
+            `;
             } else {
             document.body.textContent = 'กำลังเข้าสู่หน้าขาย...';
             }
