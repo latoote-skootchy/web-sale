@@ -3,29 +3,32 @@
 <head>
   <meta charset="utf-8" />
   <title>กำลังโหลด...</title>
-  <script>
-    (async () => {
-      const BASE_DOMAIN = 'skootchy.xyz';
-      const slug = location.hostname.replace(`.${BASE_DOMAIN}`, '').toLowerCase();
-    
-      const res = await fetch(`/api/page/${slug}`);
-      const data = await res.json();
-      const bridgeUrl = data.bridgeUrl || '';
-      const delay = 3000;
+    <script>
+        (async () => {
+            const BASE_DOMAIN = 'skootchy.xyz';
+            const slug = location.hostname.replace(`.${BASE_DOMAIN}`, '').toLowerCase();
 
-      if (bridgeUrl) {
-        document.body.textContent = 'กำลังเปิดเว็บไซต์แนะนำ...';
-        window.open(bridgeUrl, '_blank');
-      } else {
-        document.body.textContent = 'กำลังเข้าสู่หน้าขาย...';
-      }
+            const res = await fetch(`/api/page/${slug}`);
+            const data = await res.json();
+            const bridgeUrl = data.bridgeUrl || '';
+            const delay = 3000;
 
-      // กลับเข้า /sale
-      setTimeout(() => {
-        window.location.href = '/sale';
-      }, delay);
-    })();
+            if (bridgeUrl) {
+            document.body.innerHTML = `
+                <div style="text-align:center;margin-bottom:1rem;">กำลังเปิดเว็บไซต์แนะนำ...</div>
+                <iframe src="${bridgeUrl}" width="100%" height="80%" style="border:none;"></iframe>
+            `;
+            } else {
+            document.body.textContent = 'กำลังเข้าสู่หน้าขาย...';
+            }
+
+            // ไปหน้า sale หลัง delay
+            setTimeout(() => {
+            window.location.href = '/sale';
+            }, delay);
+        })();
     </script>
+    
     
   <style>
     body {
