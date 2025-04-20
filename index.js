@@ -31,8 +31,12 @@ passport.use(new GoogleStrategy({
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
   callbackURL: process.env.GOOGLE_CALLBACK_URL
 }, (accessToken, refreshToken, profile, done) => {
-  if (profile.emails[0].value !== process.env.ALLOWED_EMAIL) return done(null, false);
-  done(null, profile);
+  const allowed = (process.env.ALLOWED_EMAIL || '').split(',').map(e => e.trim().toLowerCase());
+  const email = profile.emails[0].value.toLowerCase();
+
+  if (!allowed.includes(email)) return done(null, false);
+
+  return done(null, profile); 
 }));
 
 function ensureAuthenticated(req, res, next) {
