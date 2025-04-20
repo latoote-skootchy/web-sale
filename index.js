@@ -55,6 +55,9 @@ app.use(async (req, res, next) => {
         if (req.path === '/' || req.path === '') {
           return res.sendFile(path.join(__dirname, 'public/bridge.html'));
         }
+        if (req.path === '/sale') {
+          return res.sendFile(path.join(__dirname, 'public/sale.html'));
+        }        
         if (req.path === '/policy' && page.policy) {
           return res.sendFile(path.join(__dirname, 'public/policy.html'));
         }
