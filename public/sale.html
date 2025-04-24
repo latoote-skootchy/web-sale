@@ -28,15 +28,27 @@
   </style>
 </head>
 <body>
-  <div class="wrap" id="app"></div>
+  <div class="wrap" id="app">
+    <h1 id="pageTitle"></h1>
+
+    <!-- สร้าง 10 ปุ่มล่วงหน้า -->
+    <a href="#" class="img-link" id="link0" target="_blank"><img id="img0" src="" /></a>
+    <a href="#" class="img-link" id="link1" target="_blank"><img id="img1" src="" /></a>
+    <a href="#" class="img-link" id="link2" target="_blank"><img id="img2" src="" /></a>
+    <a href="#" class="img-link" id="link3" target="_blank"><img id="img3" src="" /></a>
+    <a href="#" class="img-link" id="link4" target="_blank"><img id="img4" src="" /></a>
+    <a href="#" class="img-link" id="link5" target="_blank"><img id="img5" src="" /></a>
+    <a href="#" class="img-link" id="link6" target="_blank"><img id="img6" src="" /></a>
+    <a href="#" class="img-link" id="link7" target="_blank"><img id="img7" src="" /></a>
+    <a href="#" class="img-link" id="link8" target="_blank"><img id="img8" src="" /></a>
+    <a href="#" class="img-link" id="link9" target="_blank"><img id="img9" src="" /></a>
+  </div>
 
 <script>
 (async () => {
   const app = document.getElementById('app');
-  // const slug = location.pathname.split('/')[1]?.toLowerCase();
   const BASE_DOMAIN = 'skootchy.xyz';
   const slug = window.location.hostname.replace(`.${BASE_DOMAIN}`, '').toLowerCase();
-
 
   if (!slug) return showError('ไม่พบข้อมูล');
 
@@ -44,6 +56,8 @@
     const res = await fetch(`/api/page/${slug}`);
     if (!res.ok) return showError('ไม่พบข้อมูล');
     const item = await res.json();
+
+    // ติดตั้ง Facebook Pixel
     if (item.pixel) {
       const pixelId = String(item.pixel).replace(/[^0-9]/g, '');
 
@@ -68,39 +82,33 @@
       document.body.appendChild(noscript);
     }
 
-    const linksArr = item.links || [];
-
+    // ตั้งค่าข้อมูลบนหน้า
     document.title = item.name || 'Sale Page';
+    document.getElementById('pageTitle').textContent = item.name || slug;
 
-    const h1 = document.createElement('h1');
-    h1.textContent = item.name || slug;
-    app.appendChild(h1);
+    const imagesArr = item.images || [];
+    const linksArr = item.links || [];
+    const eventsArr = item.events || [];
 
-    (item.images || []).forEach((src, idx) => {
-      if (!src) return;
-      const link = linksArr[idx] || '';
-      const img = document.createElement('img');
-      img.src = src;
-      const eventsArr = item.events || [];
-      const eventName = eventsArr[idx] || 'Lead';
-      
+    for (let i = 0; i < 10; i++) {
+      const linkEl = document.getElementById(`link${i}`);
+      const imgEl = document.getElementById(`img${i}`);
+      const src = imagesArr[i] || '';
+      const link = linksArr[i] || '#';
+      const eventName = eventsArr[i] || 'Lead';
 
-      if (link) {
-        const a = document.createElement('a');
-        a.href = link;
-        a.target = '_blank';
-        a.className = 'img-link';
-        a.onclick = () => {
+      if (src && linkEl && imgEl) {
+        imgEl.src = src;
+        linkEl.href = link;
+        linkEl.onclick = () => {
           if (typeof fbq === 'function') {
             fbq('track', eventName);
           }
         };
-        a.appendChild(img);
-        app.appendChild(a);
       } else {
-        app.appendChild(img);
+        if (linkEl) linkEl.style.display = 'none';
       }
-    });
+    }
   } catch (err) {
     showError('เกิดข้อผิดพลาดในการโหลดข้อมูล');
   }
