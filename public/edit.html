@@ -35,7 +35,10 @@
       gap: 2rem;
     }
     #image-slots {
-      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr); /* 👈 3 ช่องต่อแถว */
+      gap: 1rem;
+      margin-top: 1rem;
     }
     #preview-panel {
       flex: 0 0 280px;
@@ -53,7 +56,7 @@
       border-radius: 6px;
       margin-bottom: 0.5rem;
       object-fit: cover;
-      height: 80px; /* จาก 120 → 80 */
+      height:   30px; /* จาก 120 → 80 */
       box-shadow: 0 0 4px rgba(0,0,0,0.1);
     }
     .slot .control-group {
