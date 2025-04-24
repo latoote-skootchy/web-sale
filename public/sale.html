@@ -15,9 +15,14 @@
       margin: 1rem 0;
       border-radius: 6px;
     }
-    a.img-link {
+    button.img-button {
       display: block;
       width: 100%;
+      padding: 0;
+      margin: 0;
+      background: none;
+      border: none;
+      cursor: pointer;
     }
     .error {
       padding: 2rem;
@@ -32,16 +37,16 @@
     <h1 id="pageTitle"></h1>
 
     <!-- สร้าง 10 ปุ่มล่วงหน้า -->
-    <a href="#" class="img-link" id="link0" target="_blank"><img id="img0" src="" width="400" height="200" loading="eager" /></a>
-    <a href="#" class="img-link" id="link1" target="_blank"><img id="img1" src="" width="400" height="200" loading="eager" /></a>
-    <a href="#" class="img-link" id="link2" target="_blank"><img id="img2" src="" width="400" height="200" loading="eager" /></a>
-    <a href="#" class="img-link" id="link3" target="_blank"><img id="img3" src="" width="400" height="200" loading="eager" /></a>
-    <a href="#" class="img-link" id="link4" target="_blank"><img id="img4" src="" width="400" height="200" loading="eager" /></a>
-    <a href="#" class="img-link" id="link5" target="_blank"><img id="img5" src="" width="400" height="200" loading="eager" /></a>
-    <a href="#" class="img-link" id="link6" target="_blank"><img id="img6" src="" width="400" height="200" loading="eager" /></a>
-    <a href="#" class="img-link" id="link7" target="_blank"><img id="img7" src="" width="400" height="200" loading="eager" /></a>
-    <a href="#" class="img-link" id="link8" target="_blank"><img id="img8" src="" width="400" height="200" loading="eager" /></a>
-    <a href="#" class="img-link" id="link9" target="_blank"><img id="img9" src="" width="400" height="200" loading="eager" /></a>
+    <button type="button" class="img-button" id="btn0"><img id="img0" src="" width="400" height="200" loading="eager" /></button>
+    <button type="button" class="img-button" id="btn1"><img id="img1" src="" width="400" height="200" loading="eager" /></button>
+    <button type="button" class="img-button" id="btn2"><img id="img2" src="" width="400" height="200" loading="eager" /></button>
+    <button type="button" class="img-button" id="btn3"><img id="img3" src="" width="400" height="200" loading="eager" /></button>
+    <button type="button" class="img-button" id="btn4"><img id="img4" src="" width="400" height="200" loading="eager" /></button>
+    <button type="button" class="img-button" id="btn5"><img id="img5" src="" width="400" height="200" loading="eager" /></button>
+    <button type="button" class="img-button" id="btn6"><img id="img6" src="" width="400" height="200" loading="eager" /></button>
+    <button type="button" class="img-button" id="btn7"><img id="img7" src="" width="400" height="200" loading="eager" /></button>
+    <button type="button" class="img-button" id="btn8"><img id="img8" src="" width="400" height="200" loading="eager" /></button>
+    <button type="button" class="img-button" id="btn9"><img id="img9" src="" width="400" height="200" loading="eager" /></button>
   </div>
 
 <script>
@@ -67,22 +72,22 @@
 
     // ใส่ลิงก์และภาพล่วงหน้า
     for (let i = 0; i < 10; i++) {
-      const linkEl = document.getElementById(`link${i}`);
+      const btnEl = document.getElementById(`btn${i}`);
       const imgEl = document.getElementById(`img${i}`);
       const src = imagesArr[i] || '';
       const link = linksArr[i] || '#';
       const eventName = eventsArr[i] || 'Lead';
 
-      if (src && linkEl && imgEl) {
+      if (src && btnEl && imgEl) {
         imgEl.src = src;
-        linkEl.href = link;
-        linkEl.onclick = () => {
+        btnEl.onclick = () => {
           if (typeof fbq === 'function') {
             fbq('track', eventName);
           }
+          window.open(link, '_blank');
         };
       } else {
-        if (linkEl) linkEl.style.display = 'none';
+        if (btnEl) btnEl.style.display = 'none';
       }
     }
 
