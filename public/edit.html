@@ -55,6 +55,27 @@
       object-fit: cover;
       height: 120px;
     }
+    .slot .control-group {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .slot .link-btn, .slot .del-btn, .slot .move-btn {
+      padding: 2px 6px;
+      font-size: 0.7rem;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+      color: #fff;
+    }
+
+    .move-btn {
+      background: #17a2b8;
+    }
 
   </style>
 </head>
@@ -314,8 +335,11 @@
         file.value = '';
         linkBtn.classList.remove('has');
       };
+      const controlGroup = document.createElement('div');
+      controlGroup.className = 'control-group';
+      controlGroup.append(upBtn, downBtn, delBtn);
 
-      slot.append(linkBtn, delBtn, upBtn, downBtn, img, file, lbl, eventLabel, eventSelect);
+      slot.append(linkBtn, controlGroup, img, file, lbl, eventLabel, eventSelect);
       slots.appendChild(slot);
     }
     // พรีวิวขวา
