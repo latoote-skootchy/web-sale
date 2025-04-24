@@ -157,11 +157,13 @@
     for (let i = 0; i < MAX_IMAGES; i++) {
       const slot = document.createElement('div');
       slot.className = 'slot';
+
       const img = document.createElement('img');
       if (item.images[i]) {
         img.src = item.images[i];
         img.style.display = 'block';
       }
+
       const file = document.createElement('input');
       file.type = 'file';
       file.accept = 'image/*';
@@ -177,9 +179,41 @@
       delBtn.className = 'del-btn';
       delBtn.textContent = 'ลบ';
 
+      const upBtn = document.createElement('button');
+      upBtn.type = 'button';
+      upBtn.className = 'link-btn';
+      upBtn.style.background = '#17a2b8';
+      upBtn.style.top = '30px';
+      upBtn.textContent = '↑';
+      upBtn.onclick = () => {
+        if (i > 0) moveSlot(i, i - 1);
+      };
+
+      const downBtn = document.createElement('button');
+      downBtn.type = 'button';
+      downBtn.className = 'link-btn';
+      downBtn.style.background = '#17a2b8';
+      downBtn.style.top = '56px';
+      downBtn.textContent = '↓';
+      downBtn.onclick = () => {
+        if (i < MAX_IMAGES - 1) moveSlot(i, i + 1);
+      };
+
       const lbl = document.createElement('span');
       lbl.className = 'label';
       lbl.textContent = `ภาพที่ ${i + 1}`;
+
+      const eventLabel = document.createElement('span');
+      eventLabel.textContent = '📌 กำหนด Facebook Pixel Event:';
+      eventLabel.style.display = 'block';
+      eventLabel.style.marginTop = '0.5rem';
+      eventLabel.style.fontSize = '0.85rem';
+
+      const eventSelect = document.createElement('select');
+      eventSelect.style.marginTop = '0.4rem';
+      eventSelect.style.width = '100%';
+      eventSelect.style.padding = '0.4rem';
+      eventSelect.style.borderRadius = '4px';
 
       const EVENTS = {
         'ผู้สนใจ (Lead)': 'Lead',
@@ -201,22 +235,16 @@
         'สมัครสมาชิก (StartSubscription)': 'StartSubscription'
       };
 
-      const eventSelect = document.createElement('select');
-      eventSelect.style.marginTop = '0.4rem';
-      eventSelect.style.width = '100%';
-      eventSelect.style.padding = '0.4rem';
-      eventSelect.style.borderRadius = '4px';
-
       Object.entries(EVENTS).forEach(([label, value]) => {
         const opt = document.createElement('option');
-        opt.value = value;               // ✅ จะได้ 'Lead', 'Purchase', ...
-        opt.textContent = `📌 ${label}`; // ✅ แสดงข้อความไทย
+        opt.value = value;
+        opt.textContent = `📌 ${label}`;
         eventSelect.appendChild(opt);
       });
 
       // ตั้งค่าเริ่มต้น
       eventSelect.value = item.events?.[i] || 'Lead';
-
+      
       eventSelect.onchange = () => {
         if (!Array.isArray(item.events)) item.events = Array(MAX_IMAGES).fill('');
         item.events[i] = eventSelect.value;
@@ -250,17 +278,12 @@
         file.value = '';
         linkBtn.classList.remove('has');
       };
-      const eventLabel = document.createElement('span');
-      eventLabel.textContent = '📌 กำหนด Facebook Pixel Event:';
-      eventLabel.style.display = 'block';
-      eventLabel.style.marginTop = '0.5rem';
-      eventLabel.style.fontSize = '0.85rem';
-
-
-      slot.append(linkBtn, delBtn, img, file, lbl, eventLabel, eventSelect);
+      
+      slot.append(linkBtn, delBtn, upBtn, downBtn, img, file, lbl, eventLabel, eventSelect);
       slots.appendChild(slot);
     }
   }
+
 
   async function validate() {
     const name = nameI.value.trim();
@@ -299,6 +322,17 @@
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(item)
     });
+  }
+  function moveSlot(from, to) {
+    const swap = (arr) => {
+      const temp = arr[from];
+      arr[from] = arr[to];
+      arr[to] = temp;
+    };
+    swap(item.images);
+    swap(item.links);
+    if (Array.isArray(item.events)) swap(item.events);
+    buildSlots();
   }
 
   init();
