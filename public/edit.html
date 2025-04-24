@@ -29,6 +29,33 @@
     .del-btn{right:6px;background:#d90404}
     #pdpa-link-wrap{display:none;margin-top:.8rem}
     #pdpa-link{padding:.55rem .7rem;border:1px solid #ccc;border-radius:4px;width:100%;background:#e9ecef}
+    .container-flex {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+    }
+    #image-slots {
+      flex: 1;
+    }
+    #preview-panel {
+      flex: 0 0 280px;
+      border-left: 1px solid #ccc;
+      padding-left: 1rem;
+      max-height: 1000px;
+      overflow-y: auto;
+    }
+    #preview-panel h4 {
+      margin-top: 0;
+      font-size: 1rem;
+    }
+    .preview-img {
+      width: 100%;
+      border-radius: 6px;
+      margin-bottom: 1rem;
+      object-fit: cover;
+      height: 120px;
+    }
+
   </style>
 </head>
 <body>
@@ -72,6 +99,15 @@
         <button type="button" id="btn-preview" class="btn btn-preview">Preview</button>
       </div>
     </form>
+
+    <div class="container-flex">
+      <div id="image-slots"></div>
+      <div id="preview-panel">
+        <h4>พรีวิวภาพรวม</h4>
+        <div id="preview-images"></div>
+      </div>
+    </div>
+    
   </main>
 
 <script>
@@ -278,10 +314,21 @@
         file.value = '';
         linkBtn.classList.remove('has');
       };
-      
+
       slot.append(linkBtn, delBtn, upBtn, downBtn, img, file, lbl, eventLabel, eventSelect);
       slots.appendChild(slot);
     }
+    // พรีวิวขวา
+    const preview = document.getElementById('preview-images');
+      preview.innerHTML = '';
+      item.images.forEach(imgSrc => {
+        if (imgSrc) {
+          const img = document.createElement('img');
+          img.src = imgSrc;
+          img.className = 'preview-img';
+          preview.appendChild(img);
+        }
+      });
   }
 
 
