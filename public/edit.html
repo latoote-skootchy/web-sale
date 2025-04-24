@@ -76,6 +76,13 @@
     .move-btn {
       background: #17a2b8;
     }
+    form#edit-form {
+      flex: 2;
+      min-width: 0;
+    }
+    #preview-panel {
+      flex: 1;
+    }
 
   </style>
 </head>
@@ -85,50 +92,48 @@
     <button class="btn btn-back" onclick="history.back()">ย้อนกลับ</button>
   </nav>
   <main>
-    <form id="edit-form">
-      <label for="name-input">ชื่อเพจ:</label>
-      <input id="name-input" type="text" placeholder="กรอกชื่อ" required />
-      <label>ลิงก์เพจ:</label>
-      <div id="link-group">
-        <input id="link-input" type="text" placeholder="ชื่อ SUB DOMAIN" />
-        <button type="button" id="btn-generate" class="btn btn-generate">สร้างจากชื่อ</button>
-        <button type="button" id="btn-copy" class="btn btn-copy">คัดลอก</button>
-      </div>
-      <small>ตัวอย่าง URL: <code id="url-preview">—</code></small>
-
-      <label style="margin-top:1.5rem;">อัปโหลดภาพ (สูงสุด 10 ภาพ):</label>
-      <div id="image-slots"></div>
-      <label for="bridge-url-input">ลิงก์ที่จะเปิดก่อนหน้า Sale:</label>
-      <input id="bridge-url-input" type="text" placeholder="เช่น https://www.youtube.com" />
-
-      <label for="pixel-input">Facebook Pixel ID:</label>
-      <input id="pixel-input" type="text" placeholder="เช่น 123456789012345" />
-
-      <hr style="margin:2rem 0 1rem">
-      <h3>นโยบายความเป็นส่วนตัว (PDPA)</h3>
-      <label><input type="checkbox" id="pdpa-toggle"> เปิดใช้นโยบายความเป็นส่วนตัว</label>
-      <div id="pdpa-link-wrap">
-        <label style="margin-top:.8rem">ลิงก์นโยบายความเป็นส่วนตัว:</label>
-        <div style="display:flex;gap:.5rem;align-items:center;margin-top:.3rem">
-          <input id="pdpa-link" type="text" readonly>
-          <button type="button" id="pdpa-copy" class="btn btn-copy">คัดลอก</button>
-        </div>
-      </div>
-
-      <div style="display:flex;gap:.5rem;margin-top:2rem">
-        <button type="submit" class="btn btn-save">บันทึก</button>
-        <button type="button" id="btn-preview" class="btn btn-preview">Preview</button>
-      </div>
-    </form>
-
     <div class="container-flex">
-      <div id="image-slots"></div>
+      <form id="edit-form">
+        <label for="name-input">ชื่อเพจ:</label>
+        <input id="name-input" type="text" placeholder="กรอกชื่อ" required />
+        <label>ลิงก์เพจ:</label>
+        <div id="link-group">
+          <input id="link-input" type="text" placeholder="ชื่อ SUB DOMAIN" />
+          <button type="button" id="btn-generate" class="btn btn-generate">สร้างจากชื่อ</button>
+          <button type="button" id="btn-copy" class="btn btn-copy">คัดลอก</button>
+        </div>
+        <small>ตัวอย่าง URL: <code id="url-preview">—</code></small>
+
+        <label style="margin-top:1.5rem;">อัปโหลดภาพ (สูงสุด 10 ภาพ):</label>
+        <div id="image-slots"></div>
+        <label for="bridge-url-input">ลิงก์ที่จะเปิดก่อนหน้า Sale:</label>
+        <input id="bridge-url-input" type="text" placeholder="เช่น https://www.youtube.com" />
+
+        <label for="pixel-input">Facebook Pixel ID:</label>
+        <input id="pixel-input" type="text" placeholder="เช่น 123456789012345" />
+
+        <hr style="margin:2rem 0 1rem">
+        <h3>นโยบายความเป็นส่วนตัว (PDPA)</h3>
+        <label><input type="checkbox" id="pdpa-toggle"> เปิดใช้นโยบายความเป็นส่วนตัว</label>
+        <div id="pdpa-link-wrap">
+          <label style="margin-top:.8rem">ลิงก์นโยบายความเป็นส่วนตัว:</label>
+          <div style="display:flex;gap:.5rem;align-items:center;margin-top:.3rem">
+            <input id="pdpa-link" type="text" readonly>
+            <button type="button" id="pdpa-copy" class="btn btn-copy">คัดลอก</button>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:.5rem;margin-top:2rem">
+          <button type="submit" class="btn btn-save">บันทึก</button>
+          <button type="button" id="btn-preview" class="btn btn-preview">Preview</button>
+        </div>
+      </form>
+
       <div id="preview-panel">
         <h4>พรีวิวภาพรวม</h4>
         <div id="preview-images"></div>
       </div>
     </div>
-    
   </main>
 
 <script>
